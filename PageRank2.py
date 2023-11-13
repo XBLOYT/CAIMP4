@@ -29,6 +29,8 @@ edgeHash = dict()  # hash of edge to ease the match
 airportList = []  # list of Airport
 airportHash = dict()  # hash key IATA code -> Airport
 
+noconectats = 0
+
 def readAirports(fd):
     print("Reading Airport file from {0}".format(fd))
     airportsTxt = open(fd, "r")
@@ -94,13 +96,16 @@ def ordenacio(val):
 def computePageRanks():
     n = len(airportList)
     P = {key: 1 / n for key in airportHash.keys()}
+    auxnoconectats = 1 / n
     L = 0.85
     nits = 100
 
     while nits > 0:
         Q = {key: 0 for key in airportHash.keys()}
         for key in airportHash.keys():
-            Q[key] = L * sumaPesos(P, key) + (1 - L) / n
+            Q[key] = L * sumaPesos(P, key) + (1-L)/n + auxnoconectats * L/n * noconectats
+
+        auxnoconectats = (1-L)/n + auxnoconectats * L/n * noconectats
 
         # Normalizar para asegurar que la suma sea 1
         total = sum(Q.values())
@@ -127,6 +132,8 @@ def outputPageRanks():
 def main(argv=None):
     readAirports("airports.txt")
     readRoutes("routes.txt")
+    global noconectats
+    noconectats = len([n for n in airportList if n.outweight == 0])
     time1 = time.time()
     iterations = computePageRanks()
     time2 = time.time()
