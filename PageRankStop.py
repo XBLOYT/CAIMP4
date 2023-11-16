@@ -108,10 +108,6 @@ def computePageRanks():
 
         auxnoconectats = (1-L)/n + auxnoconectats * L/n * noconectats
 
-        # Normalizar para asegurar que la suma sea 1
-        total = sum(Q.values())
-        Q = {k: v / total for k, v in Q.items()}
-
         stop = all(abs(a - b) < 1e-16 for a, b in zip(P.values(), Q.values()))
         P = Q
         it += 1
